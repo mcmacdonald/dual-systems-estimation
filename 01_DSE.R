@@ -182,3 +182,32 @@ print(results)
 
 
 # ... close .R script
+
+
+
+# note ... the resulting population estimates differ slightly if you calculate the predicted probabilities from the functions:
+# VGAM::fitted()
+# VGAM::predict()
+
+# ... the difference must be a rounding error made in VGAM::fitted(), though it's best to do the calculations manually with VGAM::predict()
+
+# predicted probabilities estimated from the model
+pp <- VGAM::fitted(model)
+
+# predicted probabilities in the census
+pp_census <- pp[, 1]
+
+# predicted probabilities in the post-enumeration survey
+pp_pes <- pp[, 2]
+
+# calculate the joint probability
+pp_joint <- 1 - (1 - pp_census) * (1 - pp_pes)
+
+# population estimate by the Horvitz-Thompson estimator
+sum(1/pp_joint)
+
+# show that this method does not replicate the population estimate
+sum(1/pp_joint) == model@extra$N.hat
+
+
+
