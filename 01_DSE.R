@@ -121,6 +121,10 @@ df <- data.frame(
   # the log-linear model
   model <- VGAM::vglm(y ~ 1, family = VGAM::posbernoulli.t(parallel = TRUE ~ 1), data = df)
 
+  # don't run
+  # print model summary
+  # VGAM::summary(model)
+
   # ... manually calculate predicted probabilities and confidence intervals
   pp <- VGAM::predict(model, se.fit = TRUE)
   
@@ -208,6 +212,3 @@ sum(1/pp_joint)
 
 # show that this method does not replicate the population estimate
 sum(1/pp_joint) == model@extra$N.hat
-
-
-
