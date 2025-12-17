@@ -14,7 +14,12 @@
 
 # don't run
 # install packages used in this script
-# install.packages('dplyr'); install.packages('tibble'); install.packages('stats); install.packages('VGAM')
+# install.packages(
+    # c('dplyr', 
+    #   'tibble',
+    #   'stats',
+    #   'VGAM'
+    #   )
 
 
 
@@ -31,11 +36,12 @@ set.seed(123)
   # the census counts 10,000 people
   census <- 10000
   
-  # a post-enumeration survey (PES) also surveys 10,000 people
-  pes <- 10000
+  # a post-enumeration survey (PES) surveys 1000 people
+  target <- 0.02 # let's assume that PES in this case samples 2% of the general population
+  pes <- census * target
   
   # let's assume 99% of people are part of both samples
-  recapture <- 9900
+  recapture <- pes * 0.99
 
   
   
@@ -172,7 +178,7 @@ results <- tibble::tibble(
     "coverage error, point estimate (%)",
     "coverage error, lower bound (%)",
     "coverage error, upper bound (%)"
-  ),
+    ),
   estimates = c(
     P,
     round(P_hat, 2),
@@ -182,8 +188,8 @@ results <- tibble::tibble(
     round((1 - (census / P_hat)) * 100, 2),
     round((1 - (census / P_lo)) * 100, 2),
     round((1 - (census / P_hi)) * 100, 2)
+    )
   )
-)
 print(results)
 
 
