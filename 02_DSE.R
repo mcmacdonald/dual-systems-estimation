@@ -40,7 +40,8 @@ error <- P * 0.01
 census <- P - error
 
 # sample size of the post-enumeration survey (PES)
-pes <- 380000
+target <- 0.02 # let's assume that PES in this case samples 2% of the general population
+pes <- round(P * target, digits = 0) 
 
 # let's assume that the census and PES has 99% shared coverage i.e., recapture probability
 recapture <- pes * 0.99 
@@ -53,14 +54,17 @@ recapture <- pes * 0.99
   P_hat <- (census * pes) / recapture
   
   # Seber’s variance formula
-  # https://books.google.co.uk/books/about/Estimation_of_Animal_Abundance.html?id=iIAAPQAACAAJ&redir_esc=y
+  # for reference: https://books.google.co.uk/books/about/Estimation_of_Animal_Abundance.html?id=iIAAPQAACAAJ&redir_esc=y
   v <- (census^2 * pes * (pes - recapture)) / (recapture^3)
 
   # standard error
-  s <- sqrt(v)
+  se <- sqrt(v)
+
+  # critical value
+  z <- 1.96
   
   # confidence intervals
-  ci_lower <- P_hat - 1.96 * s; ci_upper <- P_hat + 1.96 * s
+  ci_lower <- P_hat - z * se; ci_upper <- P_hat + z * se
 
 # print results
 results <- tibble::tibble(
@@ -114,6 +118,16 @@ print(results)
   # full post-numeration survey
   pes_sample <- c(ids_matched, pes_unique)
 
+  # matched samples
+  matched <- unique(c(census_sample, pes_sample))
+
+# construct data frame
+df <- data.frame(
+  id = matched,
+  in_census = ifelse(matched %in% census_sample, 1, 0),
+  in_pes = ifelse(matched %in% pes_sample, 1, 0)
+  )
+
 # construct data frame
 df <- data.frame(
   id = 1:P,
@@ -139,13 +153,13 @@ df <- data.frame(
   
     # ... for the census 
     pp_census_point <- inv_logit(pp$fitted.values[, 1])
-    pp_census_lower <- inv_logit(pp$fitted.values[, 1] - 1.96 * pp$se.fit[, 1])
-    pp_census_upper <- inv_logit(pp$fitted.values[, 1] + 1.96 * pp$se.fit[, 1])
+    pp_census_lower <- inv_logit(pp$fitted.values[, 1] - z * pp$se.fit[, 1])
+    pp_census_upper <- inv_logit(pp$fitted.values[, 1] + z * pp$se.fit[, 1])
     
     # ... for the post-enumeration survey 
     pp_pes_point <- inv_logit(pp$fitted.values[, 2])
-    pp_pes_lower <- inv_logit(pp$fitted.values[, 2] - 1.96 * pp$se.fit[, 2])
-    pp_pes_upper <- inv_logit(pp$fitted.values[, 2] + 1.96 * pp$se.fit[, 2])
+    pp_pes_lower <- inv_logit(pp$fitted.values[, 2] - z * pp$se.fit[, 2])
+    pp_pes_upper <- inv_logit(pp$fitted.values[, 2] + z * pp$se.fit[, 2])
 
 # calculate the joint probability
 joint_probability <- function(list1, list2) {
