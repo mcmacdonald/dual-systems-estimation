@@ -50,9 +50,12 @@ set.seed(123)
 
   # standard error
   s <- sqrt(v)
-  
+
+  # critical value 
+  z <- 1.96
+
   # confidence intervals
-  ci_lower <- P_hat - 1.96 * s; ci_upper <- P_hat + 1.96 * s
+  ci_lower <- P_hat - z * s; ci_upper <- P_hat + z * s
 
 # print results
 results <- tibble::tibble(
@@ -135,13 +138,13 @@ df <- data.frame(
   
     # ... for the census 
     pp_census_point <- inv_logit(pp$fitted.values[, 1])
-    pp_census_lower <- inv_logit(pp$fitted.values[, 1] - 1.96 * pp$se.fit[, 1])
-    pp_census_upper <- inv_logit(pp$fitted.values[, 1] + 1.96 * pp$se.fit[, 1])
+    pp_census_lower <- inv_logit(pp$fitted.values[, 1] - z * pp$se.fit[, 1])
+    pp_census_upper <- inv_logit(pp$fitted.values[, 1] + z * pp$se.fit[, 1])
     
     # ... for the post-enumeration survey 
     pp_pes_point <- inv_logit(pp$fitted.values[, 2])
-    pp_pes_lower <- inv_logit(pp$fitted.values[, 2] - 1.96 * pp$se.fit[, 2])
-    pp_pes_upper <- inv_logit(pp$fitted.values[, 2] + 1.96 * pp$se.fit[, 2])
+    pp_pes_lower <- inv_logit(pp$fitted.values[, 2] - z * pp$se.fit[, 2])
+    pp_pes_upper <- inv_logit(pp$fitted.values[, 2] + z * pp$se.fit[, 2])
 
 # calculate the joint probability
 joint_probability <- function(list1, list2) {
