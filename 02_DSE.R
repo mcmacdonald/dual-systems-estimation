@@ -30,24 +30,23 @@ set.seed(123)
 
 # define parameters for estimation -------------------------------------------------------------
   
-# Canada population, per 2021 Census of Population
+
+# Canadian population, per 2021 Census of Population
 P <- 36991981
 
-# let's assume that the coverage error is 1%
-error <- P * 0.01
+# let's assume the actual census counts 99.8% of people
+known <- 0.998 # let's assume that the census in this case samples 99,8% of the general population
+census <- P * known
 
-# census counts before the adjustment i.e., with error
-census <- P - error
-
-# sample size of the post-enumeration survey (PES)
+# a post-enumeration survey (PES) of the population
 target <- 0.02 # let's assume that PES in this case samples 2% of the general population
-pes <- round(P * target, digits = 0) 
+pes <- P * target
 
-# let's assume that the census and PES has 99% shared coverage i.e., recapture probability
-recapture <- pes * 0.99 
+# let's also assume 99.8% of people are part of both samples
+recapture <- pes * 0.998
 
 
-  
+
 # 1) do the arithmetic to calculate the population estimates -------------------------------------------------------------
   
   # dual systems estimation a.k.a. Lincoln-Petersen formula
