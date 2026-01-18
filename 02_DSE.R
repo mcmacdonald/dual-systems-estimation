@@ -16,10 +16,10 @@
 # install packages used in this script
 # install.packages(
 # c('dplyr', 
-  # 'tibble', 
-  # 'stats, 
-  # 'VGAM'
-  # )
+# 'tibble', 
+# 'stats, 
+# 'VGAM'
+# )
 
 
 
@@ -29,7 +29,7 @@ set.seed(123)
 
 
 # define parameters for estimation -------------------------------------------------------------
-  
+
 
 # Canadian population, per 2021 Census of Population
 P <- 36991981
@@ -39,7 +39,7 @@ known <- 0.998 # let's assume that the census in this case samples 99,8% of the 
 census <- P * known
 
 # a post-enumeration survey (PES) of the population
-target <- 0.04 # let's assume that PES in this case samples 04% of the general population
+target <- 0.04 # let's assume that PES in this case samples 10% of the general population
 pes <- P * target
 
 # let's also assume 99.8% of people are part of both samples
@@ -48,22 +48,22 @@ recapture <- pes * 0.998
 
 
 # 1) do the arithmetic to calculate the population estimates -------------------------------------------------------------
-  
-  # dual systems estimation a.k.a. Lincoln-Petersen formula
-  P_hat <- (census * pes) / recapture
-  
-  # Seber’s variance formula
-  # for reference: https://books.google.co.uk/books/about/Estimation_of_Animal_Abundance.html?id=iIAAPQAACAAJ&redir_esc=y
-  v <- (census^2 * pes * (pes - recapture)) / (recapture^3)
 
-  # standard error
-  se <- sqrt(v)
+# dual systems estimation a.k.a. Lincoln-Petersen formula
+P_hat <- (census * pes) / recapture
 
-  # critical value
-  z <- 1.96
-  
-  # confidence intervals
-  ci_lower <- P_hat - z * se; ci_upper <- P_hat + z * se
+# Seber’s variance formula
+# for reference: https://books.google.co.uk/books/about/Estimation_of_Animal_Abundance.html?id=iIAAPQAACAAJ&redir_esc=y
+v <- (census^2 * pes * (pes - recapture)) / (recapture^3)
+
+# standard error
+se <- sqrt(v)
+
+# critical value
+z <- 1.96
+
+# confidence intervals
+ci_lower <- P_hat - z * se; ci_upper <- P_hat + z * se
 
 # print results
 results <- tibble::tibble(
@@ -76,7 +76,7 @@ results <- tibble::tibble(
     "coverage error, point estimate (%)",
     "coverage error, lower bound (%)",
     "coverage error, upper bound (%)"
-    ),
+  ),
   estimates = c(
     P,
     round(P_hat, 2),
@@ -86,8 +86,8 @@ results <- tibble::tibble(
     round((1 - (census / P_hat)) * 100, 2),
     round((1 - (census / ci_lower)) * 100, 2),
     round((1 - (census / ci_upper)) * 100, 2)
-    )
   )
+)
 print(results)
 
 
@@ -96,91 +96,47 @@ print(results)
 
 # first, construct the dataset for the demonstration
 
-  # generate list of unique ids for each person in the population
-  ids <- 1:P
-  
-  # people named in both samples
-  ids_matched <- sample(ids, recapture, replace = FALSE)
-  
-  # people named in one sample or the other
-  ids_loners <- dplyr::setdiff(ids, ids_matched)
-  
-  # number of people who only appear in the census
-  census_unique <- sample(ids_loners, census - recapture, replace = FALSE)
-  
-  # number of people who only appear in the post-enumeration survey
-  pes_unique <- sample(ids_loners, pes - recapture, replace = FALSE)
-  
-  # full census sample
-  census_sample <- c(ids_matched, census_unique)
-  
-  # full post-numeration survey
-  pes_sample <- c(ids_matched, pes_unique)
+# generate list of unique ids for each person in the population
+ids <- 1:pes
 
-  # matched samples
-  matched <- unique(c(census_sample, pes_sample))
+# people named in both samples
+ids_recapture <- sample(ids, recapture, replace = FALSE)
 
-# construct data frame
-df <- data.frame(
-  id = matched,
-  in_census = ifelse(matched %in% census_sample, 1, 0),
-  in_pes = ifelse(matched %in% pes_sample, 1, 0)
-  )
+# people named in one sample or the other
+ids_unique <- dplyr::setdiff(ids, ids_recapture)
 
-# construct data frame
-df <- data.frame(
-  id = 1:P,
-  in_census = ifelse(1:P %in% census_sample, 1, 0),
-  in_pes = ifelse(1:P %in% pes_sample, 1, 0)
+# recaptures
+df <- tibble::tibble(
+  id = ids,
+  recapture = as.integer(ids %in% ids_recapture)
   )
 
 # second, estimate the model and use predicted probabilities to calculate population estimate
 
-  # the dependent variable(s) is the columns of captures
-  y <- cbind(df$in_census, df$in_pes)
-  
-  # the log-linear model
-  model <- VGAM::vglm(y ~ 1, family = VGAM::posbernoulli.t(parallel = TRUE ~ 1), data = df)
+# the log-linear model
+model <- stats::glm(recapture ~ 1, family = binomial(link = "logit"), data = df)
 
-  # ... manually calculate predicted probabilities and confidence intervals
-  pp <- VGAM::predict(model, se.fit = TRUE)
-  
-  # inverse logit function
-  inv_logit <- function(x) exp(x) / (1 + exp(x))
+# ... manually calculate predicted probabilities and confidence intervals
 
-  # point estimate and confidence intervals 
-  
-    # ... for the census 
-    pp_census_point <- inv_logit(pp$fitted.values[, 1])
-    pp_census_lower <- inv_logit(pp$fitted.values[, 1] - z * pp$se.fit[, 1])
-    pp_census_upper <- inv_logit(pp$fitted.values[, 1] + z * pp$se.fit[, 1])
-    
-    # ... for the post-enumeration survey 
-    pp_pes_point <- inv_logit(pp$fitted.values[, 2])
-    pp_pes_lower <- inv_logit(pp$fitted.values[, 2] - z * pp$se.fit[, 2])
-    pp_pes_upper <- inv_logit(pp$fitted.values[, 2] + z * pp$se.fit[, 2])
+# intercept on the log odds scale
+b0 <- summary(model)$coefficients[1]
 
-# calculate the joint probability
-joint_probability <- function(list1, list2) {
-  pp <- 1 - (1 - list1) * (1 - list2)
-  return(pp)
-  }
+# standard errors
+se <- summary(model)$coefficients[2]
 
-# Horvitz-Thompson estimator
-nhat <- function(pp){
-  nhat <- sum(1/pp)
-  return(nhat)
-}
-P_hat <- nhat(joint_probability(pp_census_point, pp_pes_point))
-P_hi <- nhat(joint_probability(pp_census_lower, pp_pes_lower))
-P_lo <- nhat(joint_probability(pp_census_upper, pp_pes_upper))
+# inverse logit function
+inv_logit <- function(x) exp(x) / (1 + exp(x))
+
+# point estimate and confidence intervals 
+pp_hat <- inv_logit(b0)
+pp_lo <- inv_logit(b0 - z * se)
+pp_hi <- inv_logit(b0 + z * se)
 
 # print results
 results <- tibble::tibble(
   statistics = c(
     "'true' population count",
     "estimated population count",
-    "standard error of the estimate",
     "95% CI lower bound",
     "95% CI upper bound",
     "coverage error, point estimate (%)",
@@ -189,13 +145,12 @@ results <- tibble::tibble(
     ),
   estimates = c(
     P,
-    round(P_hat, 2),
-    round(model@extra$SE.N.hat, 2),
-    round(P_lo, 2),
-    round(P_hi, 2),
-    round((1 - (census / P_hat)) * 100, 2),
-    round((1 - (census / P_lo)) * 100, 2),
-    round((1 - (census / P_hi)) * 100, 2)
+    census / pp_hat,
+    census / pp_lo,
+    census / pp_hi,
+    round(pp_hat, digits = 4),
+    round(pp_lo, digits = 4),
+    round(pp_hi, digits = 4)
     )
   )
 print(results)
@@ -203,3 +158,6 @@ print(results)
 
 
 # ... close .R script
+
+
+
