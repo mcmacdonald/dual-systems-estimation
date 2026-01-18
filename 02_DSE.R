@@ -76,7 +76,7 @@ results <- tibble::tibble(
     "coverage error, point estimate (%)",
     "coverage error, lower bound (%)",
     "coverage error, upper bound (%)"
-  ),
+    ),
   estimates = c(
     P,
     round(P_hat, 2),
@@ -86,8 +86,8 @@ results <- tibble::tibble(
     round((1 - (census / P_hat)) * 100, 2),
     round((1 - (census / ci_lower)) * 100, 2),
     round((1 - (census / ci_upper)) * 100, 2)
+    )
   )
-)
 print(results)
 
 
