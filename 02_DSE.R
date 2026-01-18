@@ -39,7 +39,7 @@ known <- 0.998 # let's assume that the census in this case samples 99,8% of the 
 census <- P * known
 
 # a post-enumeration survey (PES) of the population
-target <- 0.02 # let's assume that PES in this case samples 2% of the general population
+target <- 0.04 # let's assume that PES in this case samples 04% of the general population
 pes <- P * target
 
 # let's also assume 99.8% of people are part of both samples
@@ -80,7 +80,7 @@ results <- tibble::tibble(
   estimates = c(
     P,
     round(P_hat, 2),
-    round(s, 2),
+    round(se, 2),
     round(ci_lower, 2),
     round(ci_upper, 2),
     round((1 - (census / P_hat)) * 100, 2),
