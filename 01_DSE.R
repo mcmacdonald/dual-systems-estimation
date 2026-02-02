@@ -33,10 +33,10 @@ set.seed(123)
   # let's assume that the population size is 10,100
   P <- 10100
   
-  # the census counts 10,000 people
-  census <- 10000
+  # census
+  census <- 10000  # let's assume the census counts 10,000 people
   
-  # a post-enumeration survey (PES) surveys 1000 people
+  # post-enumeration survey (PES)
   target <- 0.02 # let's assume that PES in this case samples 2% of the general population
   pes <- census * target
   
@@ -204,20 +204,23 @@ print(results)
 
 # ... the difference must be a rounding error made in VGAM::fitted(), though it's best to do the calculations manually with VGAM::predict()
 
+
+# don't run
+
 # predicted probabilities estimated from the model
-pp <- VGAM::fitted(model)
+# pp <- VGAM::fitted(model)
 
 # predicted probabilities in the census
-pp_census <- pp[, 1]
+# pp_census <- pp[, 1]
 
 # predicted probabilities in the post-enumeration survey
-pp_pes <- pp[, 2]
+# pp_pes <- pp[, 2]
 
 # calculate the joint probability
-pp_joint <- 1 - (1 - pp_census) * (1 - pp_pes)
+# pp_joint <- 1 - (1 - pp_census) * (1 - pp_pes)
 
 # population estimate by the Horvitz-Thompson estimator
-sum(1/pp_joint)
+# sum(1/pp_joint)
 
 # show that this method does not replicate the population estimate
-sum(1/pp_joint) == model@extra$N.hat
+# sum(1/pp_joint) == model@extra$N.hat
