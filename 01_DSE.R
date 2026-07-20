@@ -5,7 +5,7 @@
 
 # ... this syntax calculates population estimates and confidence intervals by:
 # ... 1) dual systems estimation procedure and Seber's approximate variance formula
-# ... 2) log-linear model to calculate population estimates and confidence intervals
+# ... 2) logistic model to calculate population estimates and confidence intervals
 
 
 # ----------------------------------------------------------------------------------
@@ -90,7 +90,7 @@ print(results)
 
 
 
-# 2) use the log-linear model to calculate the estimates -------------------------------------------------------------
+# 2) use the logistic model to calculate the estimates -------------------------------------------------------------
 
 # first, construct the dataset for the demonstration
 
@@ -127,7 +127,7 @@ df <- data.frame(
   # the dependent variable(s) is the columns of captures
   y <- cbind(df$in_census, df$in_pes)
   
-  # the log-linear model
+  # the logistic model
   model <- VGAM::vglm(y ~ 1, family = VGAM::posbernoulli.t(parallel = TRUE ~ 1), data = df)
 
   # don't run
