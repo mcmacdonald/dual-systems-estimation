@@ -5,7 +5,7 @@
 
 # ... this syntax calculates population estimates and confidence intervals by:
 # ... 1) dual systems estimation procedure and Seber's approximate variance formula
-# ... 2) log-linear model to calculate population estimates and confidence intervals
+# ... 2) logistic model to calculate population estimates and confidence intervals
 
 
 # ----------------------------------------------------------------------------------
@@ -92,7 +92,7 @@ print(results)
 
 
 
-# 2) use the log-linear model to calculate the estimates -------------------------------------------------------------
+# 2) use the logistic model to calculate the estimates -------------------------------------------------------------
 
 # first, construct the dataset for the demonstration
 
@@ -113,7 +113,7 @@ df <- tibble::tibble(
 
 # second, estimate the model and use predicted probabilities to calculate population estimate
 
-# the log-linear model
+# the logistic model
 model <- stats::glm(recapture ~ 1, family = binomial(link = "logit"), data = df)
 
 # ... manually calculate predicted probabilities and confidence intervals
