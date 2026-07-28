@@ -334,6 +334,16 @@ output(
   )
 
 
+# descriptive summary of the probabillity distributions for crime types
+descriptives <- gss %>%
+    dplyr::group_by(CIR_D010) %>%
+    dplyr::summarise(
+        arithmetic_mean = mean(mu, na.rm = TRUE),
+        geometric_mean  = exp(mean(log(mu[mu > 0]), na.rm = TRUE)),
+        median = median(mu, na.rm = TRUE),
+        sample_size     = n()
+        )
+print(descriptives)
 
 
 
