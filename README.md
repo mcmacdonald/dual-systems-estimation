@@ -8,9 +8,10 @@ The contents of the both files illustrate:
 
 2) the calculation of the population, coverage error, and confidence intervals from a generalized linear model.
 
-
 The contents of the first file ('01_DSE.R') uses a census and a post-enumeration survey to estimate a small known population. It uses a vector generalized linear model to estimate the coverage error and, in turn, recover the population estimate.
 
 The contents of the second file ('02_DSE.R') uses a census and a post-enumeration survey to estimate a large population (Canada's general population, per the 2021 Census of Population). It uses a standard generalized linear model to estimate the coverage error and, in turn, recover the population estimate.
 
 The generalized linear models can also include attributes of the respondents of the census and post-enumeration surveys to adjust for population and/or sample heterogeneity that make recapture more or less likely.
+
+The contents of the third file ('03_DSE.R') uses police-reported crime incidents and self-reported information about victimization from the General Social Survey to estimate the probability than an incident is known to the police. It uses logistic regression to estimate this probability distribution by type of crime, controlling for other factors that affect reporting/non-reporting to the police.
