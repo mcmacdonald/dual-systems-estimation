@@ -347,6 +347,6 @@ print(descriptives)
 
 
 
-# emd .R script
+# end .R script
 
 
