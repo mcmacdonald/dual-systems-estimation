@@ -52,7 +52,7 @@ table(gss$PFO_100)
 # sample size of the general social survey
 victim <- nrow(gss)
 
-# let's assume 99% of people are part of both samples
+# the number of survey respondents who report that police know of the incident
 recapture <- table(gss$PFO_100)[2]
 
 
