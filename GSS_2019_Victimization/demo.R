@@ -73,7 +73,12 @@ s <- sqrt(v)
 z <- stats::qnorm(0.975)
 
 # confidence intervals
-N_lo <- N_hat - z * s; N_hi <- N_hat + z * s
+    
+    # lower bound
+    N_lo <- N_hat - z * s
+    
+    # upper bound
+    N_hi <- N_hat + z * s
 
 # print results
 results <- tibble::tibble(
