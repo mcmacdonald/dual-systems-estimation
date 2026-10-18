@@ -57,11 +57,16 @@ set.seed(123)
   # standard error
   s <- sqrt(v)
 
-  # critical value 
-  z <- 1.96
+# critical value
+z <- stats::qnorm(0.975)
 
-  # confidence intervals
-  ci_lower <- P_hat - z * s; ci_upper <- P_hat + z * s
+# confidence intervals:
+  
+  # lower bound
+  ci_lower <- P_hat - z * se
+  
+  # upper bound
+  ci_upper <- P_hat + z * se
 
 # print results
 results <- tibble::tibble(
