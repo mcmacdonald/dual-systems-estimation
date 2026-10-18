@@ -35,7 +35,7 @@ set.seed(123)
 P <- 36991981
 
 # let's assume the actual census counts 99.8% of people
-known <- 0.998 # let's assume that the census in this case samples 99,8% of the general population
+known <- 0.998 # let's assume that the census in this case samples 99.8% of the general population
 census <- P * known
 
 # a post-enumeration survey (PES) of the population
@@ -60,10 +60,15 @@ v <- (census^2 * pes * (pes - recapture)) / (recapture^3)
 se <- sqrt(v)
 
 # critical value
-z <- 1.96
+z <- stats::qnorm(0.975)
 
-# confidence intervals
-ci_lower <- P_hat - z * se; ci_upper <- P_hat + z * se
+# confidence intervals:
+  
+  # lower bound
+  ci_lower <- P_hat - z * se
+  
+  # upper bound
+  ci_upper <- P_hat + z * se
 
 # print results
 results <- tibble::tibble(
